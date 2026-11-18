@@ -43,10 +43,15 @@ const t = setInterval(() => {
   const doc = f.contentDocument;
   if (++ticks < 12 || !doc || !doc.body || !doc.fonts || doc.fonts.status !== 'loaded') { if (ticks < 60) return; }
   clearInterval(t);
+  if (!doc?.body) return;
+  const requestedFonts = FONTS.map(name => name.toLowerCase());
+  const fontLoaded = [...(doc.fonts || [])].some(face =>
+    face.status === 'loaded' &&
+    requestedFonts.includes(face.family.replace(/^["']|["']$/g, '').toLowerCase()));
   // 테마 속성은 <html> 에도, 안쪽 호스트(#screen 등)에도 붙는다 — 처음 만나는 것을 쓴다.
   const html = (THEME && doc.querySelector('[' + THEME + ']')) || doc.documentElement;
   const out = { theme: THEME ? html.getAttribute(THEME) || '' : '', tones: html.getAttribute('style') || '',
-    font: !FONTS.length || FONTS.some(n => doc.fonts.check('16px "' + n + '"')),
+    font: !FONTS.length || fontLoaded,
     h: Math.round(doc.documentElement.scrollHeight), tree: walk(doc.body, doc) };
   const pre = document.createElement('pre'); pre.id = 'out'; pre.textContent = JSON.stringify(out);
   document.body.appendChild(pre); document.title = 'DONE';

@@ -1,14 +1,14 @@
 {
-  "root": "../../..",
-  "pages": "design",
-  "out": "../../../design/_spec",
-  "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
-  "viewport": [1440, 900],
-  "fonts": ["Pretendard"],
-  "themeAttr": "data-theme",
-  "jobs": 2,
-  "virtualTimeBudget": 20000,
-  "tokens": [
-    { "file": "../../../apps/web/src/styles/_tokens.scss", "format": "css" }
-  ]
+    "root":  "../../mockups",
+    "pages":  "web",
+    "out":  "../../.artifacts/mockup-spec/web",
+    "chrome":  "C:/path/to/chrome.exe",
+    "viewport":  [
+                     1440,
+                     900
+                 ],
+    "themeAttr":  "data-theme",
+    "tokens":  [
+
+               ]
 }

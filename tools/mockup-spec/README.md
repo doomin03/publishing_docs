@@ -5,7 +5,7 @@
 이 도구는 헤드리스 Chrome 으로 목업을 렌더하고,
 브라우저가 이미 계산한 값만 화면당 수 KB 의 `<out>/<화면>.md` 로 뽑는다.
 색에는 값이 같은 토큰 이름을 붙인다.
-출력 형식은 [`SPEC-FORMAT.md`](SPEC-FORMAT.md) 가 정의한다(Figma 쪽 도구도 같은 형식을 낸다).
+출력 형식은 [`SPEC-FORMAT.md`](SPEC-FORMAT.md)가 정의한다.
 
 ## 전제
 
@@ -22,25 +22,25 @@
 
 ```powershell
 # 1) 예시 설정을 복사해 경로를 고친다
-Copy-Item publishing_docs\tools\config\web.example.json publishing_docs\tools\config\web.json
+Copy-Item tools\config\web.example.json tools\config\web.json
 
 # 2) Chrome 경로 — 설정 "chrome" 대신 환경변수로 줘도 된다(환경변수가 앞선다)
 $env:CHROME = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 # 3) 화면 하나만
-node publishing_docs\tools\mockup-spec\spec.js --config publishing_docs\tools\config\web.json equipment-workbench-2026-09
+node tools\mockup-spec\spec.js --config tools\config\web.json login-default
 
 # 4) 전체 (목록 README.md 도 다시 쓴다)
-node publishing_docs\tools\mockup-spec\spec.js --config publishing_docs\tools\config\web.json
+node tools\mockup-spec\spec.js --config tools\config\web.json
 
 # 파서 자체 검사 (Chrome 불필요)
-node publishing_docs\tools\mockup-spec\check.js
+node tools\mockup-spec\check.js
 ```
 
 - 설정 경로는 `--config` 대신 `$env:MOCKUP_SPEC_CONFIG` 로 줘도 된다.
 - 화면 이름은 `pages` 폴더 안 파일 이름에서 `.html` 을 뗀 것이다.
   인자가 없으면 `pages` 의 `*.html` 전부를 돈다(`index.html`·`_` 로 시작하는 파일 제외).
-- 출력은 탭으로 나뉜 한 줄씩이다: `화면 테마 font|NOFONT 원본KB→스펙KB`.
+- 출력은 탭으로 나뉜 한 줄씩이다: `화면 테마 font|NOFONT|FONT-NOT-CHECKED 원본KB→스펙KB`.
   `NOT-FOUND`·`NO-OUTPUT` 이 하나라도 나오면 종료 코드가 1 이다. 그 화면만 인자로 다시 돌린다.
 - Chrome 은 화면마다 하나씩, 동시에 `jobs` 개까지 뜬다.
   메모리가 빠듯하거나 다른 작업이 브라우저를 쓰는 중이면 `$env:JOBS = 1` 로 돌린다.
@@ -57,7 +57,7 @@ node publishing_docs\tools\mockup-spec\check.js
 | `out` | ✓ | — | 스펙을 쓸 폴더 | — |
 | `chrome` | ✓* | — | Chrome·headless shell 실행 파일 | `CHROME` |
 | `viewport` | | `[390, 844]` | 창·iframe 크기 `[너비, 높이]` | — |
-| `fonts` | | `[]` | 기본 글꼴. 첫 이름의 로드 여부를 머리말에 쓰고, 이 글꼴이면 `ff` 를 생략한다 | — |
+| `fonts` | | `[]` | 확인할 웹폰트의 이름과 별칭. 명시적으로 로드된 폰트가 있으면 머리말에 표시하고, 같은 글꼴이면 `ff`를 생략한다. OS 설치 폰트와 개별 글리프의 실제 사용 여부는 별도로 확인한다 | — |
 | `themeAttr` | | `""` | 테마 값을 담은 속성(예 `data-theme`). 처음 만나는 요소의 값과 인라인 `--변수` 를 쓴다 | — |
 | `meta` | | 없음 | 원본에서 뽑아 머리말에 붙일 정규식 | — |
 | `port` | | `0`(빈 포트) | 내장 서버 포트. 목업에 절대 주소가 박혀 있을 때만 쓴다 | — |
@@ -71,7 +71,7 @@ node publishing_docs\tools\mockup-spec\check.js
 
 | `format` | 읽는 모양 | 붙는 이름 |
 |---|---|---|
-| `dart` | `static const name = Color(0xAARRGGBB)` | `prefix + name` (예 `DkColors.homeDeep`) |
+| `dart` | `static const name = Color(0xAARRGGBB)` | `prefix + name` (예 `AppColors.primary`) |
 | `css` | `--name: #hex` (`#rgb`·`#rrggbb`·`#rrggbbaa`) | `prefix + --name` |
 | `json` | 문자열 잎 또는 `{ "$value" }`·`{ "value" }` 객체 | `prefix + 경로.이름` |
 

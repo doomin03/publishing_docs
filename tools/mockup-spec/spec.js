@@ -35,8 +35,8 @@ async function one(name, base) {
     '- 읽는 법: `선택자 [x,y w×h] 속성` · 들여쓰기=포함 관계 · ×N=같은 모양 반복 · `#hex=토큰` 은 값이 같은 토큰', '',
     '```', ...lines(d.tree, 0, { tokens: cfg.tokens, tones, fonts: cfg.fonts }, []), '```', ''].join(NL);
   fs.writeFileSync(path.join(cfg.out, name + '.md'), md);
-  console.log([name, d.theme || '-', d.font ? 'font' : 'NOFONT', Math.round(src.length / 1024) + 'KB→' + (md.length / 1024).toFixed(1) + 'KB'].join('\t'));
-  return { name, theme: d.theme, font: d.font, kb: md.length / 1024, src: src.length / 1024 };
+  console.log([name, d.theme || '-', !F ? 'FONT-NOT-CHECKED' : d.font ? 'font' : 'NOFONT', Math.round(src.length / 1024) + 'KB→' + (md.length / 1024).toFixed(1) + 'KB'].join('\t'));
+  return { name, theme: d.theme, font: F ? d.font : null, kb: md.length / 1024, src: src.length / 1024 };
 }
 
 (async () => {
@@ -57,5 +57,5 @@ async function one(name, base) {
   fs.writeFileSync(path.join(cfg.out, 'README.md'), ['# 목업 계산값 스펙 — 목록', '',
     '`tools/mockup-spec/spec.js` 가 만든다. 손으로 고치지 않는다. 원본 HTML 합계 ' + Math.round(done.reduce((a, r) => a + r.src, 0)) + 'KB → 스펙 합계 '
     + Math.round(done.reduce((a, r) => a + r.kb, 0)) + 'KB.', '', '| 화면 | 테마 | 폰트 | 스펙 |', '|---|---|---|---|',
-    ...done.map(r => `| [${r.name}](${r.name}.md) | ${r.theme || '—'} | ${r.font ? '✓' : '🔴'} | ${r.kb.toFixed(1)}KB |`), ''].join(NL));
+    ...done.map(r => `| [${r.name}](${r.name}.md) | ${r.theme || '—'} | ${r.font == null ? '—' : r.font ? '✓' : '🔴'} | ${r.kb.toFixed(1)}KB |`), ''].join(NL));
 })();

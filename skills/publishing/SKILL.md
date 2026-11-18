@@ -1,53 +1,27 @@
 ---
 name: publishing
 description: >-
-  목업(HTML 스냅샷·계산값 스펙)이나 Figma 디자인을 앱(Flutter)·웹 화면으로 옮기는 퍼블리싱의
-  읽는 법·정본 판정·검증·끝 조건. 목업/Figma 화면을 구현할 때, 「목업과 다르다」「Figma와 다르다」를
-  고칠 때, 퍼블 감사·골든/시각 회귀 검수, 목업과 Figma 값이 어긋나 어느 쪽을 따를지 정할 때 쓴다.
+  HTML 목업이나 Figma 디자인을 앱·웹 화면으로 구현하고 검수한다. 화면·상태별 기준을 확인하고,
+  디자인과 구현의 차이를 수정하거나 HTML과 Figma 간 불일치를 판정할 때 사용한다.
 ---
 
 # Publishing
 
-공통 절차와 분기만 둔다. 상세는 `references/` 에서 해당 칸만 읽는다.
+## 입력 × 플랫폼
 
-## 분기 — 입력 × 플랫폼
-
-두 축은 독립이다. 칸의 파일과 `common/` 을 함께 읽는다.
-한 화면에 입력이 둘이면 두 행을 다 읽고 `common/source-precedence.md` 를 먼저 적용한다.
-
-| 입력 \ 플랫폼 | 앱 | 웹 |
+| 입력 | 앱 | 웹 |
 |---|---|---|
-| 목업 HTML | `mockup/html-input.md` + `app/flutter.md` | `mockup/html-input.md` + `web/web.md` |
-| Figma | `figma/figma-input.md` + `app/flutter.md` | `figma/figma-input.md` + `web/web.md` |
+| HTML 목업 | [HTML](references/mockup/html-input.md) + 앱 기술 스택 지침 | [HTML](references/mockup/html-input.md) + [웹](references/web/web.md) |
+| Figma | [Figma](references/figma/figma-input.md) + 앱 기술 스택 지침 | [Figma](references/figma/figma-input.md) + [웹](references/web/web.md) |
 
-입력 파일(`mockup/`·`figma/`)은 플랫폼을 가리지 않는다. 플랫폼 고유 내용은 `app/`·`web/` 에만 있다.
+Flutter 앱은 [Flutter](references/app/flutter.md)를 읽는다. 다른 앱 스택은 대상 저장소의 실행·스타일·검증 지침을 따른다.
+두 입력이 있는 화면은 두 입력 지침을 읽고 같은 조건의 화면·상태를 대응시킨다.
 
-## 절차
+## 작업 절차
 
-1. 입력·플랫폼·범위(화면과 그 상태·상세 전부)를 확정한다.
-2. 기준물을 확보한다. 없거나 낡았으면 만들지 말고 보고한다.
-3. 기준물을 읽는다 — `common/reading-mockups.md`.
-4. 고치기 전에 그 화면의 기존 시험·시각 기준선을 먼저 돌려 둔다.
-5. 토큰과 기존 컴포넌트로 옮긴다 — `common/tokens.md`.
-6. 「같다」를 판정한다 — `common/judgement.md` 전 항목.
-7. 끝 조건을 모두 통과하고 어긋남을 표로 남긴다 — `common/checklist.md`.
-
-## 규칙
-
-- MUST NOT 원본 HTML 을 직접 풀어 값을 읽는다. 계산값 스펙만 읽는다.
-- MUST 색·간격·타이포는 토큰 이름으로 쓴다.
-- MUST NOT 기능(라우트·상태·API·값의 흐름)을 바꾼다. 퍼블은 겉모습만 바꾼다.
-- MUST NOT 목업에 없다고 구현 요소를 지우거나, 목업에 없는 요소·상태를 지어낸다.
-- MUST 테마·모드가 있으면 그 모드의 계산값으로 판정한다. 문장으로 판정하지 않는다.
-- MUST 렌더해서 눈으로 본 것만 끝났다고 쓴다.
-- MUST 모호하거나 정본끼리 어긋나면 추측하지 않고 묻는다.
-- SHOULD 한 작업공간에 세션 하나, 한 세션에 화면 한 묶음.
-
-## References
-
-- `references/common/` - 출처 약어, 읽는 법, 정본 우선순위, 판정, 토큰, 끝 조건, 함정.
-- `references/mockup/html-input.md` - HTML 목업·계산값 스펙 입력.
-- `references/figma/figma-input.md` - Figma 입력 뼈대와 확인 필요 항목.
-- `references/app/flutter.md` - Flutter 고유 주의점. `app/sportlog-case.md` 는 SportLog 사례.
-- `references/web/web.md` - 웹 고유 항목. 대부분 TODO.
-- `EVALUATION.md` - 이 스킬의 바탕이 된 `ver4-publishing` 평가.
+1. 요청과 저장소 지침에서 대상 앱·화면·상태, 실행 방법, 테마 및 검증 조건을 찾는다.
+2. [기준 판정](references/common/source-precedence.md)에 따라 화면·항목별 출처를 확인한다. 불일치로 판단이 필요한 항목은 보류하고 나머지는 진행한다.
+3. [화면 읽기](references/common/reading-mockups.md)를 참고해 문구·구조·비주얼·상태를 추출하고 주요 사용자 흐름과 기대 결과를 확인한다.
+4. 관련 테스트·시각 기준선이 있으면 확인하고, [토큰](references/common/tokens.md)과 기존 컴포넌트를 재사용한다.
+5. 요청 범위에서 구현한다. 스타일 수정 과정에서 라우트·상태·API·데이터 흐름을 유지한다.
+6. 변경 화면을 실행해서 [판정 기준](references/common/judgement.md)과 [체크리스트](references/common/checklist.md)에 따라 시각 결과와 실제 사용자 동작을 검증한다.
