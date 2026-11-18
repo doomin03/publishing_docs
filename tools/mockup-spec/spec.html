@@ -1,0 +1,54 @@
+<!doctype html><meta charset="utf-8"><title>WAIT</title><!-- 목업 한 장의 계산값 트리 — spec.js 가 부른다 -->
+<style>body{margin:0}iframe{border:0;display:block}</style>
+<div id="host"></div><!-- body 를 먼저 만든다 — 없으면 appendChild 가 던진다 -->
+<script>
+// 원본 HTML 을 사람·에이전트가 읽지 않게 하는 것이 목적이다. 캐스케이드·!important·display:none·
+// 테마 재매핑은 브라우저가 이미 푼 값(getComputedStyle)만 내보낸다 — 「읽는 법」을 틀릴 자리가 없다.
+// 인자: src=목업 경로 · w,h=뷰포트 · fonts=기본 글꼴(쉼표) · theme=테마 속성 이름
+const q = new URLSearchParams(location.search);
+const FONTS = (q.get('fonts') || '').split(',').filter(Boolean), THEME = q.get('theme') || '';
+const f = document.createElement('iframe'); f.src = q.get('src');
+f.style.width = q.get('w') + 'px'; f.style.height = q.get('h') + 'px';
+document.body.appendChild(f);
+const K = ['background-color','background-image','backdrop-filter','box-shadow','border-radius','opacity',
+  'padding','gap','display','flex-direction','align-items','justify-content','position','overflow',
+  'font-family','font-size','font-weight','line-height','letter-spacing','color','text-align','object-fit'];
+const EMPTY = new Set(['none','normal','auto','0px','rgba(0, 0, 0, 0)','1','visible','static','block',
+  'inline','start','row','stretch','flex-start','fill','0px 0px 0px 0px']);
+function own(el) { return [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(); }
+function node(el, cs, r) {
+  const s = {};
+  for (const k of K) { const v = cs.getPropertyValue(k); if (v && !EMPTY.has(v)) s[k] = v; }
+  const bw = cs.borderTopWidth;
+  if (bw !== '0px' && cs.borderTopStyle !== 'none') s.border = bw + ' ' + cs.borderTopStyle + ' ' + cs.borderTopColor;
+  const tx = own(el).slice(0, 40), cls = (typeof el.className === 'string' ? el.className : '').trim().split(/\s+/).slice(0, 2).join('.');
+  const src = el.tagName === 'IMG' ? (el.getAttribute('src') || '').split('/').pop().split('?')[0] : '';
+  return { t: el.tagName.toLowerCase(), c: cls, id: el.id || '', b: [r.x, r.y, r.width, r.height].map(Math.round), s, tx, src, k: [] };
+}
+function walk(el, doc) {
+  const out = [];
+  for (const ch of el.children) {
+    if (/^(SCRIPT|STYLE|LINK|META|TEMPLATE)$/.test(ch.tagName)) continue;
+    const cs = doc.defaultView.getComputedStyle(ch), r = ch.getBoundingClientRect();
+    if (cs.display === 'none' || cs.visibility === 'hidden' || !r.width || !r.height) continue;
+    const n = node(ch, cs, r); n.k = walk(ch, doc);
+    // 스타일도 글자도 없는 껍데기는 지우고 자식만 올린다 — 깊이·토큰을 아낀다.
+    const bare = !n.tx && !n.src && n.t !== 'svg' && !Object.keys(n.s).some(k => !/^(font-|line-height|letter-spacing|color|text-align)/.test(k));   // 상속되는 글자 속성만 무시
+    if (bare) out.push(...n.k); else out.push(n);
+  }
+  return out;
+}
+let ticks = 0;   // 250ms 틱: 최소 3초 기다리고, 글꼴이 다 오면 끝낸다. 15초가 지나면 그대로 끝낸다.
+const t = setInterval(() => {
+  const doc = f.contentDocument;
+  if (++ticks < 12 || !doc || !doc.body || !doc.fonts || doc.fonts.status !== 'loaded') { if (ticks < 60) return; }
+  clearInterval(t);
+  // 테마 속성은 <html> 에도, 안쪽 호스트(#screen 등)에도 붙는다 — 처음 만나는 것을 쓴다.
+  const html = (THEME && doc.querySelector('[' + THEME + ']')) || doc.documentElement;
+  const out = { theme: THEME ? html.getAttribute(THEME) || '' : '', tones: html.getAttribute('style') || '',
+    font: !FONTS.length || FONTS.some(n => doc.fonts.check('16px "' + n + '"')),
+    h: Math.round(doc.documentElement.scrollHeight), tree: walk(doc.body, doc) };
+  const pre = document.createElement('pre'); pre.id = 'out'; pre.textContent = JSON.stringify(out);
+  document.body.appendChild(pre); document.title = 'DONE';
+}, 250);
+</script>

@@ -1,0 +1,17 @@
+{
+  "root": "../../../mockups/ver4-html",
+  "pages": "pages/sapp",
+  "out": "../../../mockups/ver4-html/_spec",
+  "chrome": "C:/path/to/chrome-headless-shell-win64/chrome-headless-shell.exe",
+  "viewport": [390, 844],
+  "fonts": ["Pretendard", "Pretendard Variable"],
+  "themeAttr": "data-character-theme",
+  "meta": "layer=\\S+ view=\\S+",
+  "port": 4180,
+  "jobs": 4,
+  "virtualTimeBudget": 20000,
+  "tokens": [
+    { "file": "../../../app/packages/ui/lib/src/tokens/colors.dart", "format": "dart", "prefix": "DkColors." },
+    { "file": "../../../app/packages/ui/lib/src/tokens/ver4_child.dart", "format": "dart", "prefix": "V4Color." }
+  ]
+}
